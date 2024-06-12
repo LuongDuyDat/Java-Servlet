@@ -23,7 +23,7 @@ public class ConnectDB {
 
                 String dbURL = "jdbc:sqlserver://DESKTOP-3EFFQ58\\JUN5:1433;encrypt=true;trustServerCertificate=true;databaseName=MemoryShellDb";
                 String user = "sa";
-                String pass = "123456";
+                String pass = "";
                 Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
                 conn = DriverManager.getConnection(dbURL, user, pass);
 
