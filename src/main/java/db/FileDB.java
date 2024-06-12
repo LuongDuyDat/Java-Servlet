@@ -41,6 +41,31 @@ public class FileDB {
         return files;
     }
     
+    public ArrayList<FileUpload> searchFileByAccount(int account_id, String search) {
+        ArrayList<FileUpload> files = new ArrayList();
+        
+        Connection conn = ConnectDB.getConnection();
+        Statement st;
+        ResultSet rs;
+        
+        try {
+            String query = "SELECT CAST(file_name AS CHAR) AS file_name, CAST(file_path AS CHAR) as file_path FROM FileUpload WHERE account_id = " + String.valueOf(account_id) + " AND file_name LIKE '" + "%" + search + "%'";
+            System.out.println(query);
+            st = conn.createStatement();
+            rs = st.executeQuery(query);
+            
+            while (rs.next()) {
+                System.out.println(rs.getString("file_name"));
+                files.add(new FileUpload(rs.getString("file_path"), rs.getString("file_name")));
+            }
+        } catch (SQLException ex) {
+            System.out.println("An error occurred while get files:");
+            ex.printStackTrace();
+        }
+        
+        return files;
+    }
+    
     public void FileUpload(String file_name, String file_path, int account_id) {
         Connection conn = ConnectDB.getConnection();
         Statement st;

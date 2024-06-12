@@ -38,13 +38,15 @@ public class HomeServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        HttpSession session = request.getSession();
-        int id = (Integer)(session.getAttribute("id"));
         
-        FileDB fileDB = new FileDB();
-        ArrayList<FileUpload> fileList = fileDB.getFileByAccount(id);
-        
-        request.setAttribute("fileList", fileList);
+        if (request.getAttribute("fileList") == null) {
+            HttpSession session = request.getSession();
+            int id = (Integer)(session.getAttribute("id"));
+            FileDB fileDB = new FileDB();
+            ArrayList<FileUpload> fileList = fileDB.getFileByAccount(id);
+
+            request.setAttribute("fileList", fileList); 
+        }
         
         getServletContext().getRequestDispatcher("/home.jsp").forward(request, response);
     }
@@ -60,31 +62,40 @@ public class HomeServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String title = request.getParameter("title");
-        
-        Part filePart = request.getPart("file");
-        String fileName = filePart.getSubmittedFileName();
-        
-         // Get the absolute path of the web application
-        String appPath = request.getServletContext().getRealPath("");
-        
-        // Construct the path to the Web pages folder (webapp or webcontent)
-        String uploadPath = appPath + "uploads" + "\\" + fileName;
-        
-        filePart.write(uploadPath);
-        
-        File uploadedFile = new File(uploadPath);
-        if (uploadedFile.exists() && uploadedFile.isFile()) {
-            System.out.println("File uploaded successfully to " + uploadPath);
+        if (request.getParameter("type") != null) {
+            HttpSession session = request.getSession();
+            int id = (Integer)(session.getAttribute("id"));
+            FileDB fileDB = new FileDB();
+            ArrayList<FileUpload> fileList = fileDB.searchFileByAccount(id, request.getParameter("search-input"));
+
+            request.setAttribute("fileList", fileList); 
         } else {
-            System.out.println("File upload failed");
+            String title = request.getParameter("title");
+        
+            Part filePart = request.getPart("file");
+            String fileName = filePart.getSubmittedFileName();
+
+             // Get the absolute path of the web application
+            String appPath = request.getServletContext().getRealPath("");
+
+            // Construct the path to the Web pages folder (webapp or webcontent)
+            String uploadPath = appPath + "uploads" + "\\" + fileName;
+
+            filePart.write(uploadPath);
+
+            File uploadedFile = new File(uploadPath);
+            if (uploadedFile.exists() && uploadedFile.isFile()) {
+                System.out.println("File uploaded successfully to " + uploadPath);
+            } else {
+                System.out.println("File upload failed");
+            }
+
+            HttpSession session = request.getSession();
+            int id = (Integer)(session.getAttribute("id"));
+
+            FileDB fileDB = new FileDB();
+            fileDB.FileUpload(title, uploadPath, id);
         }
-        
-        HttpSession session = request.getSession();
-        int id = (Integer)(session.getAttribute("id"));
-        
-        FileDB fileDB = new FileDB();
-        fileDB.FileUpload(title, uploadPath, id);
         
         doGet(request, response);
     }

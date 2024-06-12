@@ -51,6 +51,13 @@
         <!-- Exercise List -->
         <div id="exerciseList">
             <h2>Danh sách file đăng tải</h2>
+            <form method="POST">
+                <div class="search-bar">
+                    <input type="hidden" name="type" value="search">
+                    <input name="search-input" class="search-input" type="text" placeholder="Tìm kiếm...">
+                    <button type="submit" class="search-button">Tìm kiếm</button>
+                </div>
+            </form>
             <ul id="list">
                 <% 
                     ArrayList<FileUpload> fileList = (ArrayList<FileUpload>) request.getAttribute("fileList");
